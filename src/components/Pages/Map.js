@@ -8,11 +8,11 @@ import { StyleSheet, View, Text, TextInput, Button, ImageBackground, Image, Touc
 // } from "react-native-maps";
 import axios from 'axios';
 // import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
-import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 
 class BusTracker extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
     }
@@ -24,57 +24,47 @@ class BusTracker extends React.Component {
     headerShown: false,
   };
 
-  componentDidMount(){
+  componentDidMount() {
     this.updateState();
   }
 
   updateState = () => {
     axios.get(` https://2ddc1e05.ngrok.io/drivers`)
       .then(res => {
-        this.setState({drivers: res.data});
+        this.setState({ drivers: res.data });
         console.log("THis is  inside the get resource");
         console.log(this.state.drivers);
         console.log("THis is  inside the get resource");
-      }).catch(err => console.log('cannot access',err));
-      console.log("THis is  outside the get resource");
-      console.log(this.state.drivers)
-      console.log("THis is  outside the get resource");
+      }).catch(err => console.log('cannot access', err));
+    console.log("THis is  outside the get resource");
+    console.log(this.state.drivers)
+    console.log("THis is  outside the get resource");
   }
 
   render() {
     return (
       <React.Fragment>
         <View style={styles.container}>
-          {/* <MapView
-          style={styles.map}
-          provider={PROVIDER_GOOGLE}
-          region={{
-            latitude: 27.645699,
-            longitude: 85.391891,
-            latitudeDelta: 0.09,
-            longitudeDelta: 0.035,
-          }}>
-          <Marker
-            coordinate={{
+          <MapView
+            provider={PROVIDER_GOOGLE} // remove if not using Google Maps
+            style={styles.map}
+            region={{
               latitude: 27.645699,
               longitude: 85.391891,
+              latitudeDelta: 0.09,
+              longitudeDelta: 0.035,
             }}
-            title="Demo"
-            description="A location to test"
-          />
-        </MapView> */}
-         <MapView
-       provider={PROVIDER_GOOGLE} // remove if not using Google Maps
-       style={styles.map}
-       region={{
-         latitude: 37.78825,
-         longitude: -122.4324,
-         latitudeDelta: 0.015,
-         longitudeDelta: 0.0121,
-       }}
-     >
-     </MapView>
-          <Text style={{color: 'white'}}>
+          >
+            <Marker
+              coordinate={{
+                latitude: 27.645699,
+                longitude: 85.391891,
+              }}
+              title="Test Maker"
+              description="This is the test marker"
+            />
+          </MapView>
+          <Text style={{ color: 'white' }}>
             This is the Map Section.
           </Text>
         </View>
