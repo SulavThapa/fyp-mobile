@@ -16,7 +16,7 @@ class Verification extends React.Component {
 
                     <View style={styles.container}>
                         <Card style={styles.card}>
-          <Image style={styles.logo} source={require('../../../assets/d.png')}></Image>
+                            <Image style={styles.logo} source={require('../../../assets/d.png')}></Image>
 
                             <TextInput style={styles.input}
                                 underlineColorAndroid="transparent"
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
         height: 130,
         width: 130
-      },
+    },
     footer: {
         color: 'gray',
         fontSize: 11,
@@ -92,6 +92,7 @@ const styles = StyleSheet.create({
         margin: 15,
         justifyContent: 'center',
         height: 50,
+        borderRadius: 5
     },
     submitButtonText: {
         color: 'white'
