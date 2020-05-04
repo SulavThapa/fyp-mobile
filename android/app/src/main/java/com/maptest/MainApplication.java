@@ -6,6 +6,7 @@ import android.content.Context;
 import com.airbnb.android.react.maps.BuildConfig;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import com.reactnativecommunity.geolocation.GeolocationPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import org.reactnative.maskedview.RNCMaskedViewPackage;
@@ -32,6 +33,7 @@ public class MainApplication extends Application implements ReactApplication {
           protected List<ReactPackage> getPackages() {
               return Arrays.<ReactPackage>asList(
                       new MainReactPackage(),
+            new GeolocationPackage(),
             new SafeAreaContextPackage(),
             new RNCMaskedViewPackage(),
             new RNGestureHandlerPackage(),

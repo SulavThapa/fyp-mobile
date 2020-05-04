@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Text, TextInput, Button, ImageBackground, Image, TouchableOpacity } from 'react-native';
-// import MapView, {
-//   Marker,
-//   AnimatedRegion,
-//   Polyline,
-//   PROVIDER_GOOGLE
-// } from "react-native-maps";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Button,
+  ImageBackground,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator,
+  PermissionsAndroid,Platform
+} from 'react-native';
 import axios from 'axios';
-// import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Card } from 'react-native-shadow-cards';
 
@@ -18,8 +22,12 @@ class BusTracker extends React.Component {
     this.state = {
       drivers: [],
       lat: '',
-      lon:'',
-      data:[]
+      lon: '',
+      data: [],
+      first: [],
+      busNumber: '',
+      fullName: '',
+      busRoute: '',
     }
   }
 
@@ -32,50 +40,44 @@ class BusTracker extends React.Component {
     this.updateState();
     this.fetchDriver();
   }
-
-
-  updateState = () => {
+   updateState = () => {
 
     fetch('https://api.thingspeak.com/channels/1021842/feeds.json?api_key=LIN8G7PKND7MMP6E&results=1', {
-         method: 'GET'
-      })
+      method: 'GET'
+    })
       .then((response) => response.json())
       .then((responseJson) => {
-         console.log(responseJson);
-         this.setState({
-            data: responseJson,
-            lat: responseJson.feeds[0].field1,
-            lon: responseJson.feeds[0].field2,
-         })
+        this.setState({
+          data: responseJson,
+          lat: responseJson.feeds[0].field1,
+          lon: responseJson.feeds[0].field2,
+        })
       })
       .catch((error) => {
-         console.error(error);
+        console.error(error);
       });
   }
 
   fetchDriver = () => {
     fetch('https://77c59586.ngrok.io/drivers', {
-         method: 'GET'
-      })
+      method: 'GET'
+    })
       .then((response) => response.json())
       .then((responseJson) => {
-         console.log(responseJson);
-         this.setState({
-            drivers: responseJson
-         })
+        this.setState({
+          drivers: responseJson,
+          busNumber: responseJson[0].busNumber,
+          fullName: responseJson[0].fullName,
+          busRoute: responseJson[0].busRoute
+        })
       })
       .catch((error) => {
-         console.error(error);
+        console.error(error);
       });
-      
+
   }
 
   render() {
-    const lati = this.state.lat;
-    const longi = this.state.lon;
-    const driver = this.state.drivers;
-    console.log(lati + longi)
-    console.log(driver)
     return (
       <React.Fragment>
         <View style={styles.container}>
@@ -117,21 +119,28 @@ class BusTracker extends React.Component {
               icon={require('../../../assets/tool.png')}
             />
           </MapView>
-          {this.state.drivers.map( (driver, i) =>
-            <Card style={styles.card}>
+          {/* {this.state.drivers.map( (driver, i) => */}
+          <Card style={styles.card}>
             <View style={styles.secondcontainer}>
-              <Image style={styles.logo} source={require('../../../assets/bus.png')}></Image>
-              <View style={styles.cardView}>
-                <Text style={styles.cardtext}>Bus Number</Text>
-                <Text style={styles.innertext}>{driver.busNumber}</Text>
-                <Text style={styles.cardtext1}>Driver Name</Text>
-                <Text style={styles.innertext}>{driver.fullName}</Text>
-                <Text style={styles.cardtext2}>Bus Route</Text>
-                <Text style={styles.innertext}>{driver.busRoute}</Text>
-              </View>
+              {this.state.busNumber.length > 0 ?
+                <React.Fragment>
+                  <Image style={styles.logo} source={require('../../../assets/bus.png')}></Image>
+                  <View style={styles.cardView}>
+                    <Text style={styles.cardtext}>Bus Number</Text>
+                    <Text style={styles.innertext}>{this.state.busNumber}</Text>
+                    <Text style={styles.cardtext1}>Driver Name</Text>
+                    <Text style={styles.innertext}>{this.state.fullName}</Text>
+                    <Text style={styles.cardtext2}>Bus Route</Text>
+                    <Text style={styles.innertext}>{this.state.busRoute}</Text>
+                  </View>
+                </React.Fragment>
+                : <ActivityIndicator size="small" color="#00ff00" />
+
+              }
+
             </View>
           </Card>
-          )}
+          {/* )} */}
         </View>
       </React.Fragment>
     )
@@ -153,7 +162,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject
   },
   innertext: {
-    fontSize: 17,
+    fontSize: 16,
     fontFamily: 'monospace',
     textAlign: 'center'
   },
