@@ -9,11 +9,12 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
-  PermissionsAndroid,Platform
+  PermissionsAndroid, Platform
 } from 'react-native';
 import axios from 'axios';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Card } from 'react-native-shadow-cards';
+import GetLocation from 'react-native-get-location'
 
 
 class BusTracker extends React.Component {
@@ -28,6 +29,17 @@ class BusTracker extends React.Component {
       busNumber: '',
       fullName: '',
       busRoute: '',
+      location: null,
+      stop: [
+        { latitude: 27.637611, longitude: 85.3933118, description: 'Biruwa Bus Stop' },
+        { latitude: 27.6405099, longitude: 85.3909004, description: 'Bindebashini Marga Bus Stop' },
+        { latitude: 27.6418975, longitude: 85.3905974, description: 'Hardware Bus Stop' },
+        { latitude: 27.6439017, longitude: 85.3886393, description: 'Mill Bus Stop' },
+        { latitude: 27.6439017, longitude: 85.3886393, description: 'Suyel Gau Bus Stop' },
+        { latitude: 27.6452703, longitude: 85.3882424 , description: 'Palace Bus Stop'},
+        { latitude: 27.6462492, longitude: 85.3872124 , description: 'New Marga Bus Stop'},
+        { latitude: 27.6483876, longitude: 85.3856675 , description: 'Nic Asia Bus Stop'}
+      ]
     }
   }
 
@@ -39,8 +51,28 @@ class BusTracker extends React.Component {
   componentDidMount() {
     this.updateState();
     this.fetchDriver();
+    // this.findCoordinates();
+    this.currentLocation();
   }
-   updateState = () => {
+
+  currentLocation = () => {
+    GetLocation.getCurrentPosition({
+      enableHighAccuracy: true,
+      timeout: 15000,
+    })
+      .then(location => {
+        this.setState({
+          location: location
+        })
+        console.log(this.state.location);
+      })
+      .catch(error => {
+        const { code, message } = error;
+        console.warn(code, message);
+      })
+  }
+
+  updateState = () => {
 
     fetch('https://api.thingspeak.com/channels/1021842/feeds.json?api_key=LIN8G7PKND7MMP6E&results=1', {
       method: 'GET'
@@ -59,7 +91,7 @@ class BusTracker extends React.Component {
   }
 
   fetchDriver = () => {
-    fetch('https://77c59586.ngrok.io/drivers', {
+    fetch('https://71977534.ngrok.io/drivers', {
       method: 'GET'
     })
       .then((response) => response.json())
@@ -74,7 +106,6 @@ class BusTracker extends React.Component {
       .catch((error) => {
         console.error(error);
       });
-
   }
 
   render() {
@@ -85,41 +116,24 @@ class BusTracker extends React.Component {
             provider={PROVIDER_GOOGLE} // remove if not using Google Maps
             style={styles.map}
             region={{
-              latitude: 27.645699,
-              longitude: 85.391891,
+              latitude: 27.6439017,
+              longitude: 85.3886393,
               latitudeDelta: 0,
               longitudeDelta: 0.01,
             }}
           >
-            <Marker
-              coordinate={{
-                latitude: 27.645699,
-                longitude: 85.391891,
-              }}
-              title="Test Maker"
-              description="This is the test marker"
-              icon={require('../../../assets/tool.png')}
-            />
-            <Marker
-              coordinate={{
-                latitude: 27.645699,
-                longitude: 85.392885,
-              }}
-              title="Test Maker"
-              description="This is the test marker"
-              icon={require('../../../assets/tool.png')}
-            />
-            <Marker
-              coordinate={{
-                latitude: 27.645699,
-                longitude: 85.393891,
-              }}
-              title="Test Maker"
-              description="This is the test marker"
-              icon={require('../../../assets/tool.png')}
-            />
+            {this.state.stop.map(stop =>
+              <Marker
+                coordinate={{
+                  latitude: stop.latitude,
+                  longitude: stop.longitude,
+                }}
+                title="Bus Stop"
+                description={stop.description}
+                icon={require('../../../assets/tool.png')}
+              />
+            )}
           </MapView>
-          {/* {this.state.drivers.map( (driver, i) => */}
           <Card style={styles.card}>
             <View style={styles.secondcontainer}>
               {this.state.busNumber.length > 0 ?
@@ -135,12 +149,9 @@ class BusTracker extends React.Component {
                   </View>
                 </React.Fragment>
                 : <ActivityIndicator size="small" color="#00ff00" />
-
               }
-
             </View>
           </Card>
-          {/* )} */}
         </View>
       </React.Fragment>
     )
