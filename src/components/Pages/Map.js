@@ -29,16 +29,17 @@ class BusTracker extends React.Component {
       busNumber: '',
       fullName: '',
       busRoute: '',
-      location: null,
+      currentLocationLat: '',
+      currentLocationLon: '',
       stop: [
         { latitude: 27.637611, longitude: 85.3933118, description: 'Biruwa Bus Stop' },
         { latitude: 27.6405099, longitude: 85.3909004, description: 'Bindebashini Marga Bus Stop' },
         { latitude: 27.6418975, longitude: 85.3905974, description: 'Hardware Bus Stop' },
         { latitude: 27.6439017, longitude: 85.3886393, description: 'Mill Bus Stop' },
         { latitude: 27.6439017, longitude: 85.3886393, description: 'Suyel Gau Bus Stop' },
-        { latitude: 27.6452703, longitude: 85.3882424 , description: 'Palace Bus Stop'},
-        { latitude: 27.6462492, longitude: 85.3872124 , description: 'New Marga Bus Stop'},
-        { latitude: 27.6483876, longitude: 85.3856675 , description: 'Nic Asia Bus Stop'}
+        { latitude: 27.6452703, longitude: 85.3882424, description: 'Palace Bus Stop' },
+        { latitude: 27.6462492, longitude: 85.3872124, description: 'New Marga Bus Stop' },
+        { latitude: 27.6483876, longitude: 85.3856675, description: 'Nic Asia Bus Stop' }
       ]
     }
   }
@@ -51,7 +52,6 @@ class BusTracker extends React.Component {
   componentDidMount() {
     this.updateState();
     this.fetchDriver();
-    // this.findCoordinates();
     this.currentLocation();
   }
 
@@ -62,9 +62,9 @@ class BusTracker extends React.Component {
     })
       .then(location => {
         this.setState({
-          location: location
+          currentLocationLat: location.latitude,
+          currentLocationLon: location.longitude
         })
-        console.log(this.state.location);
       })
       .catch(error => {
         const { code, message } = error;
@@ -81,8 +81,8 @@ class BusTracker extends React.Component {
       .then((responseJson) => {
         this.setState({
           data: responseJson,
-          lat: responseJson.feeds[0].field1,
-          lon: responseJson.feeds[0].field2,
+          lat: parseFloat(responseJson.feeds[0].field1),
+          lon: parseFloat(responseJson.feeds[0].field2),
         })
       })
       .catch((error) => {
@@ -91,13 +91,13 @@ class BusTracker extends React.Component {
   }
 
   fetchDriver = () => {
-    fetch('https://71977534.ngrok.io/drivers', {
+    fetch('https://7474a9ec.ngrok.io/drivers', {
       method: 'GET'
     })
       .then((response) => response.json())
       .then((responseJson) => {
         this.setState({
-          drivers: responseJson,
+          drivers: responseJson.feeds,
           busNumber: responseJson[0].busNumber,
           fullName: responseJson[0].fullName,
           busRoute: responseJson[0].busRoute
@@ -122,6 +122,15 @@ class BusTracker extends React.Component {
               longitudeDelta: 0.01,
             }}
           >
+            {/* <Marker
+                coordinate={{
+                  latitude: this.state.currentLocationLat,
+                  longitude: this.state.currentLocationLon,
+                }}
+                title="Bus Stop"
+                description="dssd"
+                icon={require('../../../assets/pin.png')}
+              /> */}
             {this.state.stop.map(stop =>
               <Marker
                 coordinate={{

@@ -9,6 +9,23 @@ class Verification extends React.Component {
         headerShown: false,
     };
 
+    state = {
+        code: ''
+    }
+
+    handleChange = (text) => {
+        this.setState({ code: text })
+      }
+    
+
+    handlesubmit = () => {
+        if (this.state.code == '7YLqrC') {
+            this.props.navigation.navigate('BusTracker')
+          }else{
+            alert('Invalid Code');
+          }
+    }
+
     render() {
         return (
             <React.Fragment>
@@ -23,13 +40,11 @@ class Verification extends React.Component {
                                 placeholder="Bus Code"
                                 placeholderTextColor="#9a73ef"
                                 autoCapitalize="none"
-                                onChangeText={this.handlesubmit} />
+                                onChangeText={this.handleChange} />
 
                             <TouchableOpacity
                                 style={styles.submitButton}
-                                onPress={
-                                    () => this.props.navigation.navigate('BusTracker')
-                                }>
+                                onPress={this.handlesubmit}>
                                 <Text style={styles.submitButtonText}>     Submit     </Text>
                             </TouchableOpacity>
                         </Card>
