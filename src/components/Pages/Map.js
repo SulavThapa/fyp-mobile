@@ -12,7 +12,7 @@ import {
   PermissionsAndroid, Platform
 } from 'react-native';
 import axios from 'axios';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE, Polyline } from 'react-native-maps';
 import { Card } from 'react-native-shadow-cards';
 import GetLocation from 'react-native-get-location'
 navigator.geolocation = require('@react-native-community/geolocation');
@@ -82,12 +82,9 @@ class BusTracker extends React.Component {
     })
       .then(location => {
         this.setState({
-          latitude: location.latitude,
-          longitude: location.longitude,
+          currentLocationLat: location.latitude,
+          currentLocationLon: location.longitude,
         })
-        console.log(this.state.latitude)
-        console.log(this.state.longitude)
-
       })
       .catch(error => {
         const { code, message } = error;
@@ -150,7 +147,29 @@ class BusTracker extends React.Component {
               longitudeDelta: 0.01,
             }}
           >
-              <Marker
+            <Polyline
+              coordinates={[
+                { latitude: 27.637611, longitude: 85.3933118 },
+                { latitude: 27.6405099, longitude: 85.3909004 },
+                { latitude: 27.6418975, longitude: 85.3905974 },
+                { latitude: 27.6439017, longitude: 85.3886393 },
+                { latitude: 27.6439017, longitude: 85.3886393 },
+                { latitude: 27.6452703, longitude: 85.3882424 },
+                { latitude: 27.6462492, longitude: 85.3872124 },
+                { latitude: 27.6483876, longitude: 85.3856675 }
+              ]}
+              strokeColor="teal" // fallback for when `strokeColors` is not supported by the map-provider
+              strokeColors={[
+                '#7F0000',
+                '#00000000', // no color, creates a "long" gradient between the previous and next coordinate
+                '#B24112',
+                '#E5845C',
+                '#238C23',
+                '#7F0000'
+              ]}
+              strokeWidth={3}
+            />
+            <Marker
               coordinate={{
                 latitude: Number(this.state.lat),
                 longitude: Number(this.state.lon),
@@ -158,6 +177,16 @@ class BusTracker extends React.Component {
               title="Bus Location"
               description=""
               icon={require('../../../assets/automobile.png')}
+            />
+
+            <Marker
+              coordinate={{
+                latitude: Number(this.state.currentLocationLat),
+                longitude: Number(this.state.currentLocationLon),
+              }}
+              title="Your Location"
+              description=""
+              icon={require('../../../assets/pin.png')}
             />
             {this.state.stop.map(stop =>
               <Marker
