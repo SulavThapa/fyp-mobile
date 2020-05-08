@@ -15,15 +15,19 @@ class Verification extends React.Component {
 
     handleChange = (text) => {
         this.setState({ code: text })
-      }
-    
+    }
+
+
+    // handlesubmit = () => {
+    //     if (this.state.code == '7YLqrC') {
+    //         this.props.navigation.navigate('BusTracker')
+    //       }else{
+    //         alert('Invalid Code');
+    //       }
+    // }
 
     handlesubmit = () => {
-        if (this.state.code == '7YLqrC') {
-            this.props.navigation.navigate('BusTracker')
-          }else{
-            alert('Invalid Code');
-          }
+    this.props.navigation.navigate('BusTracker')
     }
 
     render() {

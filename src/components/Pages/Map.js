@@ -15,7 +15,7 @@ import axios from 'axios';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Card } from 'react-native-shadow-cards';
 import GetLocation from 'react-native-get-location'
-
+navigator.geolocation = require('@react-native-community/geolocation');
 
 class BusTracker extends React.Component {
   constructor(props) {
@@ -29,8 +29,9 @@ class BusTracker extends React.Component {
       busNumber: '',
       fullName: '',
       busRoute: '',
-      currentLocationLat: '',
-      currentLocationLon: '',
+      currentLocationLat: 27.717245000000002,
+      currentLocationLon: 85.32395999999999,
+      pos: [],
       stop: [
         { latitude: 27.637611, longitude: 85.3933118, description: 'Biruwa Bus Stop' },
         { latitude: 27.6405099, longitude: 85.3909004, description: 'Bindebashini Marga Bus Stop' },
@@ -40,7 +41,10 @@ class BusTracker extends React.Component {
         { latitude: 27.6452703, longitude: 85.3882424, description: 'Palace Bus Stop' },
         { latitude: 27.6462492, longitude: 85.3872124, description: 'New Marga Bus Stop' },
         { latitude: 27.6483876, longitude: 85.3856675, description: 'Nic Asia Bus Stop' }
-      ]
+      ],
+      location: [],
+      longitude: 0,
+      latitude: 0
     }
   }
 
@@ -49,11 +53,27 @@ class BusTracker extends React.Component {
     headerShown: false,
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     this.updateState();
     this.fetchDriver();
-    this.currentLocation();
+
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      {
+        'title': 'ReactNativeCode Location Permission',
+        'message': 'ReactNativeCode App needs access to your location '
+      }
+    )
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      this.currentLocation();
+    }
+    else {
+      alert("Location Permission Not Granted");
+    }
+  } catch(err) {
+    console.warn(err)
   }
+
 
   currentLocation = () => {
     GetLocation.getCurrentPosition({
@@ -62,9 +82,12 @@ class BusTracker extends React.Component {
     })
       .then(location => {
         this.setState({
-          currentLocationLat: location.latitude,
-          currentLocationLon: location.longitude
+          latitude: location.latitude,
+          longitude: location.longitude,
         })
+        console.log(this.state.latitude)
+        console.log(this.state.longitude)
+
       })
       .catch(error => {
         const { code, message } = error;
@@ -80,9 +103,9 @@ class BusTracker extends React.Component {
       .then((response) => response.json())
       .then((responseJson) => {
         this.setState({
-          data: responseJson,
-          lat: parseFloat(responseJson.feeds[0].field1),
-          lon: parseFloat(responseJson.feeds[0].field2),
+          data: responseJson.feeds[0],
+          lat: responseJson.feeds[0].field1,
+          lon: responseJson.feeds[0].field2
         })
       })
       .catch((error) => {
@@ -91,7 +114,7 @@ class BusTracker extends React.Component {
   }
 
   fetchDriver = () => {
-    fetch('https://7474a9ec.ngrok.io/drivers', {
+    fetch('https://b809215e.ngrok.io/drivers', {
       method: 'GET'
     })
       .then((response) => response.json())
@@ -109,6 +132,11 @@ class BusTracker extends React.Component {
   }
 
   render() {
+
+    const latlngi = {
+      latitude: this.state.latitude,
+      longitude: this.state.longitude
+    }
     return (
       <React.Fragment>
         <View style={styles.container}>
@@ -122,15 +150,15 @@ class BusTracker extends React.Component {
               longitudeDelta: 0.01,
             }}
           >
-            {/* <Marker
-                coordinate={{
-                  latitude: this.state.currentLocationLat,
-                  longitude: this.state.currentLocationLon,
-                }}
-                title="Bus Stop"
-                description="dssd"
-                icon={require('../../../assets/pin.png')}
-              /> */}
+              <Marker
+              coordinate={{
+                latitude: Number(this.state.lat),
+                longitude: Number(this.state.lon),
+              }}
+              title="Bus Location"
+              description=""
+              icon={require('../../../assets/automobile.png')}
+            />
             {this.state.stop.map(stop =>
               <Marker
                 coordinate={{

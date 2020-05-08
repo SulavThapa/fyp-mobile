@@ -17,13 +17,8 @@ class Landing extends React.Component {
   };
 
   state = {
-    email: '',
-    drivers: []
+    email: ''
   };
-
-  componentDidMount() {
-    // this.send();
-  }
 
   handleChange = (text) => {
     this.setState({ email: text })
@@ -34,40 +29,34 @@ class Landing extends React.Component {
     if (this.state.email == '') {
       alert('Fields cannot be empty');
     } else {
-      // axios.get(` https://db737949.ngrok.io/sendmail`)
-      // .then(res => {
-      //   this.setState({drivers: res.data});
-      //   console.log(res);
-      // }).catch(err => console.log('cannot access',err));
-
       this.props.navigation.navigate('Verification')
     }
   }
 
-  // send = () => {
-  //   if(this.state.email.trim() != 0){
-  //     alert('Fields cannot be empty');
-  //   }else{
-  //     axios.post(`http://localhost:5000/sendmail/`,
-  //       {
-  //           email : this.state.email
-  //       } ,
-  //       {
-  //           headers: {
-  //               'Accept': 'application/json',
-  //               'Content-Type': 'application/json; charset=UTF-8'
-  //           },
-  //       })
-  //       .then( res => {
-  //           console.log(res);
-  //           console.log(res.data);
-  //       })
-  //       .catch(err => {
-  //           console.log(`${err}`)
-  //       })
-  //   }
-  //   console.log(this.state.email);
-  // };
+  send = () => {
+    if(this.state.email.trim() != 0){
+      alert('Fields cannot be empty');
+    }else{
+      axios.post(`http://localhost:5000/sendmail/`,
+        {
+            email : this.state.email
+        } ,
+        {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json; charset=UTF-8'
+            },
+        })
+        .then( res => {
+            console.log(res);
+            console.log(res.data);
+        })
+        .catch(err => {
+            console.log(`${err}`)
+        })
+    }
+    console.log(this.state.email);
+  };
 
   render() {
     return (
