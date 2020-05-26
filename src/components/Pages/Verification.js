@@ -18,17 +18,17 @@ class Verification extends React.Component {
     }
 
 
-    // handlesubmit = () => {
-    //     if (this.state.code == '7YLqrC') {
-    //         this.props.navigation.navigate('BusTracker')
-    //       }else{
-    //         alert('Invalid Code');
-    //       }
-    // }
-
     handlesubmit = () => {
-    this.props.navigation.navigate('BusTracker')
+        if (this.state.code == '7YLqrC') {
+            this.props.navigation.navigate('BusTracker')
+          }else{
+            alert('Invalid Code');
+          }
     }
+
+    // handlesubmit = () => {
+    // this.props.navigation.navigate('BusTracker')
+    // }
 
     render() {
         return (

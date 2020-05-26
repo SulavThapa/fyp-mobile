@@ -29,31 +29,32 @@ class Landing extends React.Component {
     if (this.state.email == '') {
       alert('Fields cannot be empty');
     } else {
+      axios.post(`https://407ee26c.ngrok.io/sendmail/`,
+        {
+          email: this.state.email
+        },
+        {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json; charset=UTF-8'
+          },
+        })
+        .then(res => {
+          console.log(res);
+          console.log(res.data);
+        })
+        .catch(err => {
+          console.log(`${err}`)
+        })
       this.props.navigation.navigate('Verification')
     }
   }
 
   send = () => {
-    if(this.state.email.trim() != 0){
+    if (this.state.email.trim() != 0) {
       alert('Fields cannot be empty');
-    }else{
-      axios.post(`http://localhost:5000/sendmail/`,
-        {
-            email : this.state.email
-        } ,
-        {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json; charset=UTF-8'
-            },
-        })
-        .then( res => {
-            console.log(res);
-            console.log(res.data);
-        })
-        .catch(err => {
-            console.log(`${err}`)
-        })
+    } else {
+
     }
     console.log(this.state.email);
   };

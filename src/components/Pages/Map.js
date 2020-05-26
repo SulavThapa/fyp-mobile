@@ -44,7 +44,8 @@ class BusTracker extends React.Component {
       ],
       location: [],
       longitude: 0,
-      latitude: 0
+      latitude: 0,
+      poly: []
     }
   }
 
@@ -56,6 +57,7 @@ class BusTracker extends React.Component {
   async componentDidMount() {
     this.updateState();
     this.fetchDriver();
+    this.busTravelHistory();
 
     const granted = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
@@ -74,6 +76,18 @@ class BusTracker extends React.Component {
     console.warn(err)
   }
 
+  busTravelHistory = () => {
+    axios.get(`https://api.thingspeak.com/channels/1021842/feeds.json?api_key=LIN8G7PKND7MMP6E&results=25`)
+      .then(res => {
+        for (let i = 0; res.data.feeds.length > i; i++) {
+          this.state.poly.push({
+            latitude: parseFloat(res.data.feeds[i].field1),
+            longitude: parseFloat(res.data.feeds[i].field2)
+          })
+        }
+        console.log(this.state.poly);
+      }).catch(err => console.log('Cannot access', err));
+  }
 
   currentLocation = () => {
     GetLocation.getCurrentPosition({
@@ -111,7 +125,7 @@ class BusTracker extends React.Component {
   }
 
   fetchDriver = () => {
-    fetch('https://b809215e.ngrok.io/drivers', {
+    fetch('https://9a21a808.ngrok.io/drivers', {
       method: 'GET'
     })
       .then((response) => response.json())
@@ -129,11 +143,6 @@ class BusTracker extends React.Component {
   }
 
   render() {
-
-    const latlngi = {
-      latitude: this.state.latitude,
-      longitude: this.state.longitude
-    }
     return (
       <React.Fragment>
         <View style={styles.container}>
@@ -147,28 +156,17 @@ class BusTracker extends React.Component {
               longitudeDelta: 0.01,
             }}
           >
-            <Polyline
-              coordinates={[
-                { latitude: 27.637611, longitude: 85.3933118 },
-                { latitude: 27.6405099, longitude: 85.3909004 },
-                { latitude: 27.6418975, longitude: 85.3905974 },
-                { latitude: 27.6439017, longitude: 85.3886393 },
-                { latitude: 27.6439017, longitude: 85.3886393 },
-                { latitude: 27.6452703, longitude: 85.3882424 },
-                { latitude: 27.6462492, longitude: 85.3872124 },
-                { latitude: 27.6483876, longitude: 85.3856675 }
-              ]}
-              strokeColor="teal" // fallback for when `strokeColors` is not supported by the map-provider
-              strokeColors={[
-                '#7F0000',
-                '#00000000', // no color, creates a "long" gradient between the previous and next coordinate
-                '#B24112',
-                '#E5845C',
-                '#238C23',
-                '#7F0000'
-              ]}
-              strokeWidth={3}
+            {/* school location */}
+            <Marker
+              coordinate={{
+                latitude: 27.647143,
+                longitude: 85.392513
+              }}
+              title="School"
+              description="ABC School"
+              icon={require('../../../assets/school.png')}
             />
+            {/* Bus location */}
             <Marker
               coordinate={{
                 latitude: Number(this.state.lat),
@@ -178,7 +176,7 @@ class BusTracker extends React.Component {
               description=""
               icon={require('../../../assets/automobile.png')}
             />
-
+            {/* User Location */}
             <Marker
               coordinate={{
                 latitude: Number(this.state.currentLocationLat),
@@ -188,6 +186,7 @@ class BusTracker extends React.Component {
               description=""
               icon={require('../../../assets/pin.png')}
             />
+            {/* Bus stops */}
             {this.state.stop.map(stop =>
               <Marker
                 coordinate={{
@@ -200,6 +199,7 @@ class BusTracker extends React.Component {
               />
             )}
           </MapView>
+          {/* Driver Details */}
           <Card style={styles.card}>
             <View style={styles.secondcontainer}>
               {this.state.busNumber.length > 0 ?
